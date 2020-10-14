@@ -63,33 +63,39 @@ export class Apitodolist extends React.Component {
 
 	render() {
 		return (
-			<div>
+			<div className="container">
 				<label>
 					<input
 						type="text"
-						placeholder="Añadimos una tarea?"
+						placeholder="What need to be done?"
 						onKeyPress={this.addToList}
 					/>
 				</label>
 
-				<div>
-					<h1>todos - API</h1>
-
+				<div className="Bloque">
 					<ul>
 						{this.state.todos.map((todo, index) => {
 							return (
-								<li key={index}>
+								<li
+									key={index}
+									onMouseEnter={e => {
+										className = "desactivado";
+									}}>
 									{todo.label}
+
 									<button
-										onClick={() =>
+										className={this.state.display}
+										onClick={e =>
 											this.deleteFromList(index)
 										}>
-										Cerrar
+										X
 									</button>
 								</li>
 							);
 						})}
 					</ul>
+
+					<p className="left">{this.state.todos.length} item left</p>
 				</div>
 			</div>
 		);

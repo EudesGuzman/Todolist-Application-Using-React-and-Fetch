@@ -8,8 +8,7 @@ import { Apitodolist } from "./apitodolist.js";
 export function Home() {
 	return (
 		<div className="text-center mt-5">
-			<h1>MyTasks</h1>
-			{/* <Todolist /> */}
+			<h1>TODOS</h1>
 			<Apitodolist />
 		</div>
 	);

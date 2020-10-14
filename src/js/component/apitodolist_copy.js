@@ -5,18 +5,9 @@ export class Apitodolist extends React.Component {
 		super(props);
 
 		this.state = {
-			todos: [
-				{ done: false, title: "Make The bed", id: Math.random() * 10 },
-				{ done: false, title: "Wash my hands", id: Math.random() * 10 },
-				{ done: false, title: "Eat", id: Math.random() * 10 }
-			],
-
+			todos: [],
 			value: []
 		};
-
-		this.handleChange = this.handleChange.bind(this);
-		this.handleSubmit = this.handleSubmit.bind(this);
-		this.cerrar = this.cerrar.bind(this);
 	}
 
 	componentDidMount() {
@@ -27,94 +18,70 @@ export class Apitodolist extends React.Component {
 			}
 		})
 			.then(resp => {
-				console.log(resp.ok); // will be true if the response is successfull
-				console.log(resp.status); // the status code = 200 or code = 400 etc.
-				//console.log(resp.text()); // will try return the exact result as string
 				return resp.json(); // (returns promise) will try to parse the result as json as return a promise that you can .then for results
 			})
 			.then(data => {
-				//here is were your code should start after the fetch finishes
 				console.log(data); //this will print on the console the exact object received from the server
-				//this.setState({ todos: data });
-				this.todos = data;
+				for (let x in data) {
+					this.setState({ todos: [...this.state.todos, data[x]] });
+				}
+				/* this.state.todos = data; */
 			})
 			.catch(error => {
-				//error handling
 				console.log(error);
 			});
 	}
 
-	handleChange(event) {
-		this.setState({ value: event.target.value });
-	}
-
-	handleSubmit(event) {
-		event.preventDefault();
-		let valor = this.state.value;
-		let arrayVacio = [];
-		let newTodo = { done: false, title: valor, id: Math.random() * 10 };
-		arrayVacio.push(newTodo);
-
-		let arrayTodos = this.state.todos;
-
-		if (this.state.value == "" || this.state.value == " ") {
-			for (let i = 0; i < arrayTodos.length; i++) {
-				if (valor !== arrayTodos[i].title) {
-					arrayVacio.splice(i, 0, arrayTodos[i]);
-				}
-			}
-			arrayVacio.pop();
-		} else {
-			for (let i = 0; i < arrayTodos.length; i++) {
-				if (valor !== arrayTodos[i].title) {
-					arrayVacio.splice(i, 0, arrayTodos[i]);
-				}
-			}
-		}
-
-		this.setState({
-			todos: arrayVacio,
-			value: ""
+	componentDidUpdate() {
+		fetch("https://assets.breatheco.de/apis/fake/todos/user/eu", {
+			method: "PUT",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify(this.state.todos)
 		});
 	}
 
-	cerrar(todo) {
-		let addArray = [];
-		for (let i = 0; i < this.state.todos.length; i++) {
-			if (todo !== this.state.todos[i]) {
-				addArray.splice(i, 1);
-				addArray.push(this.state.todos[i]);
+	addToList = e => {
+		if (e.key === "Enter") {
+			console.log(this.state.value);
+			if (e.target.value.split(" ").join("").length > 0) {
+				this.setState({
+					todos: [
+						...this.state.todos,
+						{ label: e.target.value, done: false }
+					]
+				});
 			}
+			e.target.value = "";
 		}
+	};
 
+	deleteFromList = index => {
 		this.setState({
-			todos: addArray
+			todos: this.state.todos.filter((item, pos) => pos !== index)
 		});
-	}
+	};
 
 	render() {
 		return (
 			<div>
-				<form onSubmit={this.handleSubmit}>
-					<label>
-						<input
-							type="text"
-							value={this.state.value}
-							onChange={this.handleChange}
-							placeholder="Añade una nueva tarea"
-						/>
-					</label>
-					<input type="submit" value="Submit" />
-				</form>
-				<div>
-					<h1>todos</h1>
+				<label>
+					<input
+						type="text"
+						placeholder="What need to be done?"
+						onKeyPress={this.addToList}
+					/>
+				</label>
 
+				<div>
 					<ul>
 						{this.state.todos.map((todo, index) => {
 							return (
 								<li key={index}>
-									{todo.title}
-									<button onClick={() => this.cerrar(todo)}>
+									{todo.label}
+									<button
+										onClick={() =>
+											this.deleteFromList(index)
+										}>
 										Cerrar
 									</button>
 								</li>
