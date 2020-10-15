@@ -6,7 +6,8 @@ export class Apitodolist extends React.Component {
 
 		this.state = {
 			todos: [],
-			value: []
+			value: [],
+			open: -1
 		};
 	}
 
@@ -75,16 +76,27 @@ export class Apitodolist extends React.Component {
 				<div className="Bloque">
 					<ul>
 						{this.state.todos.map((todo, index) => {
+							let isOpen =
+								this.state.open === index ? true : false;
 							return (
 								<li
 									key={index}
 									onMouseEnter={e => {
-										className = "desactivado";
+										this.setState({ open: index });
+									}}
+									onMouseOut={e => {
+										this.setState({ open: -1 });
 									}}>
 									{todo.label}
 
 									<button
-										className={this.state.display}
+										key={index}
+										onMouseEnter={e => {
+											this.setState({ open: index });
+										}}
+										style={{
+											display: isOpen ? "inherit" : "none"
+										}}
 										onClick={e =>
 											this.deleteFromList(index)
 										}>
